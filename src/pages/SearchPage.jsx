@@ -21,13 +21,15 @@ const SearchPage = () => {
 	const [selectedCategory, setSelectedCategory] = useState("All");
 	console.log("## selectedCategory", selectedCategory);
 	const [searchParams, setSearchParams] = useSearchParams();
-	const keyword = searchParams.get("q") || "";
+	const keyword = searchParams.get("s") || "";
 	const { data: cocktailCardData, isLoading, isError, error } = useSearchCocktailsByName(keyword);
 	console.log("##cocktailCardData", cocktailCardData);
 	const handleSearch = (keyword) => {
 		// e.preventDefault();
-		setSearchParams({ q: keyword });
+		setSearchParams({ s: keyword });
 	};
+
+	console.log("searchParams", searchParams);
 
 	const handleCategoryChange = (category) => {
 		console.log("Changing to category:", category);
