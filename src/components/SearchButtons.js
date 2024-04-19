@@ -1,16 +1,17 @@
 import { Box, Button } from "@mui/material";
 import React, { useState } from "react";
+import { category } from "../constant/list";
 
-const categories = ["카테고리1", "카테고리2", "카테고리3", "카테고리4"];
-const SearchButtons = () => {
+const SearchButtons = ({ onCategoryChange }) => {
 	const [selected, setSelected] = useState(0);
-
+	console.log("##category", category);
 	const buttonStyle = (isSelected) => ({
 		backgroundColor: isSelected ? "#FD4926" : "white",
 		borderColor: isSelected ? "white" : "lightgray",
 		color: isSelected ? "white" : "#FD4926",
-		borderRadius: 50,
+		// borderRadius: 50,
 		border: `1px solid ${isSelected ? "white" : "#FD4926"}`,
+		borderRadius: "8px",
 		"&:hover": {
 			backgroundColor: "#FD4926",
 			borderColor: "white",
@@ -27,11 +28,14 @@ const SearchButtons = () => {
 				justifyContent: "center",
 			}}
 		>
-			{categories.map((category, index) => (
+			{category.map((categoryItem, index) => (
 				<Button
 					key={index}
 					variant="outlined"
-					onClick={() => setSelected(index)}
+					onClick={() => {
+						setSelected(index);
+						onCategoryChange?.(categoryItem);
+					}}
 					sx={buttonStyle(selected === index)}
 					// sx={{
 					// backgroundColor: "white",
@@ -54,7 +58,7 @@ const SearchButtons = () => {
 					// },
 					// }}
 				>
-					{category}
+					{categoryItem}
 				</Button>
 			))}
 		</Box>
