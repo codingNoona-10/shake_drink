@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Container, Typography } from "@mui/material";
-import SearchButtons from "../components/SearchButtons";
 import { styled } from "@mui/material/styles";
-import SearchForm from "../components/SearchForm";
 import { useSearchParams } from "react-router-dom";
+import SearchForm from "../components/SearchForm"; // 검색창
+import SearchButtons from "../components/SearchButtons"; // 카테고리 버튼
+import Card from "../components/card/Card"; // 카드 컴포넌트
+// hook
+import { useSearchCocktailsByName } from "../hooks/useSearchCocktailsByName";
 
 const ContainerSx = styled(Container)(({ theme, paddingTop = 8, paddingBottom = 6 }) => ({
 	// pt: 8,
@@ -15,13 +18,41 @@ const ContainerSx = styled(Container)(({ theme, paddingTop = 8, paddingBottom = 
 }));
 
 const SearchPage = () => {
+	const [selectedCategory, setSelectedCategory] = useState("All");
+	console.log("## selectedCategory", selectedCategory);
 	const [searchParams, setSearchParams] = useSearchParams();
-	const keyword = searchParams.get("q");
-
-	const handleSearch = (e) => {
-		e.preventDefault();
+	const keyword = searchParams.get("q") || "";
+	const { data: cocktailCardData, isLoading, isError, error } = useSearchCocktailsByName(keyword);
+	console.log("##cocktailCardData", cocktailCardData);
+	const handleSearch = (keyword) => {
+		// e.preventDefault();
 		setSearchParams({ q: keyword });
 	};
+
+	const handleCategoryChange = (category) => {
+		console.log("Changing to category:", category);
+		setSelectedCategory(category);
+		console.log("Current selected category:", selectedCategory);
+	};
+
+	const filteredCocktails =
+		cocktailCardData &&
+		(selectedCategory === "All"
+			? cocktailCardData
+			: cocktailCardData.filter(
+					(cocktail) => cocktail.strCategory.toLowerCase() === selectedCategory.toLowerCase(),
+			  ));
+
+	if (isLoading) return <div>Loading...</div>;
+	if (isError) {
+		console.error("Error fetching data:", error);
+		return <div>An error occurred: {error?.message || "Network or server issue"}</div>;
+	}
+	if (!cocktailCardData || cocktailCardData.length === 0) {
+		return <div>No cocktails found.</div>;
+	}
+	console.log("Filtered cocktails:", filteredCocktails);
+
 	return (
 		<>
 			<Box>
@@ -62,8 +93,29 @@ const SearchPage = () => {
 				</Box>
 				<Box>
 					<ContainerSx maxWidth="lg">
-						<SearchButtons />
+						<SearchButtons onCategoryChange={handleCategoryChange} />
 					</ContainerSx>
+				</Box>
+
+				<Box sx={{ mb: 4 }}>
+					<Container maxWidth="lg">
+						<Box
+							sx={{
+								mt: 1,
+								//   pb: 4,
+								//   pl: 4,
+								//   pr: 4,
+								display: "flex",
+								flexWrap: "wrap",
+								gap: 3,
+								justifyContent: "space-between",
+							}}
+						>
+							{filteredCocktails.map((cockTailData, index) => (
+								<Card key={index} cockTailData={cockTailData} />
+							))}
+						</Box>
+					</Container>
 				</Box>
 			</Box>
 		</>
