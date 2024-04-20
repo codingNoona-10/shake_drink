@@ -85,6 +85,9 @@ function AppLayout() {
 		navigate(`/search?s=${keyword}`);
 		setKeyword("");
 	};
+	const goToUserPage = () => {
+		navigate("/user");
+	};
 
 	// 프로필 메뉴 클로즈 핸들러
 	const handleCloseUserMenu = () => {
